@@ -2,9 +2,10 @@ package com.equipoXD.agenda_contactos.controller;
 
 import java.util.List;
 
-import org.hibernate.query.NativeQuery.ReturnProperty;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,11 +26,19 @@ public class agendaContactosController {
    public List <agendaContactosModel> traerContactos() {
        return agendaContactosRepository.findAll();
     }
+     //metodo para traer contactos por id
+    @GetMapping("/traerContacto/{id}")
+    public ResponseEntity<agendaContactosModel> traerContactoId(@PathVariable Long id) {
+       return agendaContactosRepository.findById(id)
+       .map(contacto -> ResponseEntity.ok(contacto))
+       .orElse(ResponseEntity.notFound().build());
+    }
     //metodo para agragar contactos a la base de datos
    @PostMapping("/agregarContacto")
    public agendaContactosModel agregarContacto(@RequestBody agendaContactosModel contacto) {
        return agendaContactosRepository.save(contacto);
    }
+   //metodo para modificar contactos
    @PutMapping("/editarContacto/{id}")
     public ResponseEntity<agendaContactosModel> editarContacto (@PathVariable Long id, @RequestBody agendaContactosModel contacto) {
        return agendaContactosRepository.findById(id).map(contactoExistente -> {
@@ -43,4 +52,9 @@ public class agendaContactosController {
            return ResponseEntity.ok(actualizado);
        }).orElse(ResponseEntity.notFound().build());
     }
+    //metodo para eliminar contactos
+    @DeleteMapping("/eliminarContacto/{id}")
+    public void eliminarContacto (@PathVariable Long id) {
+       agendaContactosRepository.deleteById(id);
+}
 }
