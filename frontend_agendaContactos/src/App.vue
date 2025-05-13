@@ -7,7 +7,7 @@ const cargarContactos= async () => {
 
 const response = await axios.get('http://localhost:8080/contactos/traerContactos')
 contactos.value = response.data;
-console.log(contactos.data);
+console.log(contactos.value);
 
 }
 onMounted(cargarContactos);
