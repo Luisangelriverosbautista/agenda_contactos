@@ -1,0 +1,62 @@
+package com.equipoXD.agenda_contactos.controller;
+
+import java.util.List;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import com.equipoXD.agenda_contactos.model.agendaContactosModel;
+import com.equipoXD.agenda_contactos.repository.agendaContactosRepository;
+
+@RestController
+@RequestMapping("/contactos")
+@CrossOrigin (origins = "*")
+public class agendaContactosController {
+    @Autowired
+   private agendaContactosRepository agendaContactosRepository;
+   //metodo para traer contactos
+   @GetMapping("/traerContactos")
+   public List <agendaContactosModel> traerContactos() {
+       return agendaContactosRepository.findAll();
+    }
+     //metodo para traer contactos por id
+    @GetMapping("/traerContacto/{id}")
+    public ResponseEntity<agendaContactosModel> traerContactoId(@PathVariable Long id) {
+       return agendaContactosRepository.findById(id)
+       .map(contacto -> ResponseEntity.ok(contacto))
+       .orElse(ResponseEntity.notFound().build());
+    }
+    //metodo para agragar contactos a la base de datos
+   @PostMapping("/agregarContacto")
+   public agendaContactosModel agregarContacto(@RequestBody agendaContactosModel contacto) {
+       return agendaContactosRepository.save(contacto);
+   }
+   //metodo para modificar contactos
+   @PutMapping("/editarContacto/{id}")
+    public ResponseEntity<agendaContactosModel> editarContacto (@PathVariable Long id, @RequestBody agendaContactosModel contacto) {
+       return agendaContactosRepository.findById(id).map(contactoExistente -> {
+           contactoExistente.setNombre(contacto.getNombre());
+           contactoExistente.setTelefono(contacto.getTelefono());
+           contactoExistente.setEmail(contacto.getEmail());
+           contactoExistente.setDireccion(contacto.getDireccion());
+           contactoExistente.setOficio(contacto.getOficio());
+           contactoExistente.setImagen(contacto.getImagen());
+           agendaContactosModel actualizado = agendaContactosRepository.save(contactoExistente);
+           return ResponseEntity.ok(actualizado);
+       }).orElse(ResponseEntity.notFound().build());
+    }
+    //metodo para eliminar contactos
+    @DeleteMapping("/eliminarContacto/{id}")
+    public void eliminarContacto (@PathVariable Long id) {
+       agendaContactosRepository.deleteById(id);
+}
+}
